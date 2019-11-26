@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import csv
+import coding_helper
+
 
 ### HELPERS
 #unique transformed in python
@@ -62,10 +64,21 @@ with open('compare.csv',mode ='w') as compare_file:
             answers = []
             for coder in coders:
                 answers.append(full_dict[coder][i][item])
+            is_empty = not any([ bool( answer) for answer in answers ])
+            print(answers)
             if item in ABDICO:
-                row[item+'_hi']= upper_bound(answers)
-                row[item+'_lo']= agreement(answers)
+                if is_empty:
+                    row[item+'_lo']= 'NA'
+                    row[item+'_hi']= 'NA'
+                else:
+                    row[item+'_lo']= agreement(answers)
+                    row[item+'_hi']= upper_bound(answers)
             else:
-                row[item]= agreement(answers)
+                if is_empty:
+                    row[item]= 'NA'
+                else:
+                    row[item]= agreement(answers)
         compare_writer.writerow(row)
 
+
+coding_helper.sayyouareimportant()
