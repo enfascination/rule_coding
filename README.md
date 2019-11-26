@@ -1,10 +1,20 @@
 ### `compare.py`:
-Package needed: numpy, pandas, xlrd
-input file: rules_data_codifying.xlsx
-output file: compare.csv
+#### Installation
+Package needed: `numpy`, `pandas`, `xlrd`
+#### Usage
+input file: `rules_data_codifying.xlsx`
+output file: `compare.csv`
 
 ### `break_compounds.py`:
-Package needed: nltk, openpyxl 
+#### Installation
+Package needed: `nltk`, `openpyxl`
 also, must run: 
-```nltk.download('punkt')```
+```python
+nltk.download('punkt')
+```
+
+#### Usage
+```shell
+python break_compounds.py <codifying>.xlsx <codifying>_decompounded.xlsx
+```
 
