@@ -18,3 +18,6 @@ nltk.download('punkt')
 python break_compounds.py <codifying>.xlsx <codifying>_decompounded.xlsx
 ```
 
+## Updates
+  11/25 update -- statistical summary: summary.py  output: summary.csv 
+added positon agreement measure to compare.py

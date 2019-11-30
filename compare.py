@@ -25,34 +25,48 @@ def upper_bound(answers):
   else:
       return(max(result)/len(answers))
 
-def agreement(answers):
+#get the maximum agreement
+def maxagreement(answers):
   result = []
   temp = set(answers)
   for i in temp:
     result.append(answers.count(i))
-  return(max(result)/len(answers))
+  return(max(result))
+
+#max of the begining position and the ending position agreement divided by IS length
+def posagreement(answers,text):
+  beginlist = []
+  endlist = []
+  for answer in answers:
+    answer = str(answer)
+    beginlist.append(text.find(answer))
+    endlist.append(text.find(answer)+ len(answer.split()) - 1)
+  return((maxagreement(beginlist)+ maxagreement(beginlist))/(2*len(text.split())))
 
 ### SCRIPT
 #read document
 xls = pd.ExcelFile('rules_data_codifying.xlsx')
-coders = xls.sheet_names[1:11]
+sheet_names = xls.sheet_names
+coders = ['Arti', 'B', 'Qiankun', 'William', 'FREY', 'Caitlyn', 'MichaelA']
 Master = xls.parse(0)
 columns = Master.to_dict('split')['columns']
+Master = Master.to_dict('index')
 
 #read each sheet
 full_dict = {}
 x = 1
-for x, coder in enumerate(coders):
-  sheet = xls.parse( x+1 )
-  full_dict[coder] =  sheet.to_dict('index')
+for x, sheet_name in enumerate(sheet_names, start=1):
+  if sheet_name.startswith('statements_') and sheet_name.split('_')[1] in coders:
+    sheet = xls.parse( x )
+    full_dict[sheet_name] =  sheet.to_dict('index')
 
-dic_size = len(full_dict['Statements_Arti'])
-fieldnames_in = ['Text Type', 'Institution Type', 'Rule/Norm/Strategy', 'Level of Analysis', 
+dic_size = len(full_dict['statements_Arti'])
+fieldnames_in = ['Text Type', 'Institution Type', 'Rule/Norm/Strategy', 'Level of Analysis',
                  'Attribute', 'Deontic', 'aIm', 'oBject', 'Or Else', 'Condition']
-fieldnames_out = ['Text Type', 'Institution Type', 'Rule/Norm/Strategy', 'Level of Analysis', 
-                  'Attribute_lo', 'Attribute_hi', 'Deontic_lo', 'Deontic_hi', 
-                  'aIm_lo', 'aIm_hi', 'oBject_lo', 'oBject_hi', 'Or Else_lo', 'Or Else_hi', 
-                  'Condition_lo', 'Condition_hi']
+fieldnames_out = ['Text Type', 'Institution Type', 'Rule/Norm/Strategy', 'Level of Analysis',
+                  'Attribute_lo', 'Attribute_hi', 'Attribute_position', 'Deontic_lo', 'Deontic_hi', 'Deontic_position',
+                  'aIm_lo', 'aIm_hi', 'aIm_position', 'oBject_lo', 'oBject_hi', 'oBject_position', 'Or Else_lo', 'Or Else_hi',
+                  'Or Else_position','Condition_lo', 'Condition_hi', 'Condition_position']
 ABDICO = ['Attribute', 'Deontic', 'aIm', 'oBject', 'Or Else', 'Condition']
 # build output
 with open('compare.csv',mode ='w') as compare_file:
@@ -63,22 +77,21 @@ with open('compare.csv',mode ='w') as compare_file:
         for item in fieldnames_in:
             answers = []
             for coder in coders:
-                answers.append(full_dict[coder][i][item])
-            is_empty = not any([ bool( answer) for answer in answers ])
-            print(answers)
+                #print( coder, i, item )
+                #print( len(full_dict['statements_'+coder]) )
+                answer = full_dict['statements_'+coder][i][item]
+                if type(answer) != type(np.nan):
+                    answers.append(answer)
+            is_empty = all([ (type(answer) == type(np.nan) ) for answer in answers ])
+            if is_empty:
+                continue
+            if item == "Text Type":
+                print(answers)
+            #print(answers)
             if item in ABDICO:
-                if is_empty:
-                    row[item+'_lo']= 'NA'
-                    row[item+'_hi']= 'NA'
-                else:
-                    row[item+'_lo']= agreement(answers)
-                    row[item+'_hi']= upper_bound(answers)
+                row[item+'_hi']= upper_bound(answers)
+                row[item+'_lo']= maxagreement(answers)/len(answers)
+                row[item+'_position'] = posagreement(answers, Master[i]['Institutional Statement'])
             else:
-                if is_empty:
-                    row[item]= 'NA'
-                else:
-                    row[item]= agreement(answers)
+                row[item]= maxagreement(answers)/len(answers)
         compare_writer.writerow(row)
-
-
-coding_helper.sayyouareimportant()
