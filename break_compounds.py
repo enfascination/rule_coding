@@ -62,7 +62,7 @@ if __name__ == "__main__":
             an_is = an_is.replace(r'\\', ' ') # for minecraft
             if an_is.startswith('='):
                 an_is = '\\' + an_is
-                an_is = an_is.replace(r'.**', '. ') # for reddit: sentences followed by markdown
+            an_is = an_is.replace(r'.**', '. ') # for reddit: sentences followed by markdown
             an_is = an_is.replace(r'.*', '. ') # for reddit
             an_is = an_is.replace(r'\n\n**', '. ') # for reddit: double \n+bullets instead of .'s
             an_is = an_is.replace(r'\n\n*', '. ') # for reddit
