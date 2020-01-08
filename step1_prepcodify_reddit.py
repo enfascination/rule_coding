@@ -60,7 +60,7 @@ with open( args.columnheader, 'r') as header_file:
 
 with open(args.input, 'r') as jsonl_infile:
     writer = csv.DictWriter(sys.stdout, delimiter=',', fieldnames=header)
-    line_counter = 1 # can't use enumerate because I increment this in funny ways in the loop
+    line_counter = 0 # can't use enumerate because I increment this in funny ways in the loop
     for row in  jsonl_infile: ### for each subreddit
         jrow = json.loads( row )
         for rule in jrow['rules']: ### for each rule in the sub
@@ -68,6 +68,8 @@ with open(args.input, 'r') as jsonl_infile:
             ### string handling
             rule_text = rule_text.replace(r'"', "'") # for reddit: lots of quotes to deal with
             #rule_text = rule_text.replace(r'\r', r'\n') # wierd newlines
+            if rule_text.startswith('='): # excellhandling
+                rule_text = '\\' + rule_text
             ### aiding tokenizer
             rule_text = rule_text.replace(r'.**', '. ') # for reddit: sentences followed by markdown
             rule_text = rule_text.replace(r'.*', '. ') # for reddit
@@ -81,13 +83,23 @@ with open(args.input, 'r') as jsonl_infile:
             rule_text = rule_text.replace(r'\n*', '. ') # for reddit
             rule_text = rule_text.replace(r'\n', ' ') # for reddit
             rule_texts = nltk.sent_tokenize( rule_text )
+            ### write the rule as an IS, and it's descript as several IS's
+            ### this is necesary because it simplifies the context tab and because rules are sometimes written with the description referring to content in the short name of the rule
+            trow = header.copy()
+            trow['domain'] = 'reddit'
+            trow['communityID'] = 'r/' + jrow['sub']
+            trow['timestamp'] = rule['createdUtc']
+            trow['ref'] = 'https://www.reddit.com/' + trow['communityID']
+            trow['text'] = rule['shortName']
+            trow['lineID'] = line_counter
+            line_counter += 1
+            writer.writerow( trow )
             for rule_text in rule_texts: ### for each institutional statement in the rule
                 trow = header.copy()
                 trow['domain'] = 'reddit'
                 trow['communityID'] = 'r/' + jrow['sub']
                 trow['timestamp'] = rule['createdUtc']
                 trow['ref'] = 'https://www.reddit.com/' + trow['communityID']
-                trow['context'] = rule['shortName']
                 trow['text'] = rule_text
                 trow['lineID'] = line_counter
                 line_counter += 1
