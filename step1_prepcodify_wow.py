@@ -16,14 +16,14 @@ import nltk
 ### HELPER
 ### selectionSort from https://runestone.academy/runestone/books/published/pythonds/SortSearch/TheSelectionSort.html
 def selectionSort(alist):
-	for fillslot in range(len(alist)-1,0,-1):
-		positionOfMax = 0
-		for location in range(1,fillslot+1):
-			if alist[location] > alist[positionOfMax]:
-				positionOfMax = location
-		temp = alist[fillslot]
-		alist[fillslot] = alist[positionOfMax]
-		alist[positionOfMax] = temp
+    for fillslot in range(len(alist)-1,0,-1):
+        positionOfMax = 0
+        for location in range(1,fillslot+1):
+            if alist[location] > alist[positionOfMax]:
+                positionOfMax = location
+        temp = alist[fillslot]
+        alist[fillslot] = alist[positionOfMax]
+        alist[positionOfMax] = temp
 
 
 parser = argparse.ArgumentParser()
@@ -68,49 +68,54 @@ file_list = []
 data = os.getcwd() + '/data/wow_data/' ### get the current working directory
 files = os.listdir(data) ### access the contents in the directory
 for fi in files:
-	if fi[-3::] != '.py': ### if the file isn't a python script
-		if fi != '.DS_Store': ### if the file isn't a nonetype
-			if fi != 'todo_servers.txt': ### could not find a way around this one bc this isn't a directory
-				#print( fi )
-				alist = os.listdir( data + fi ) #assign the list of files to a list
-				# print('unsorted', alist) [this is how I double-checked my work)
-				# now get only the main rules, no speciality rules
-				alist = [ item for item in alist if re.match(r'^\d{8}.txt$', item)]
-				if alist:
-					#print( alist )
-					selectionSort(alist) # mutator
-					#print( alist[-1] )
-					#print()
-					#print( fi + '/' + alist[-1])
-					# print('sorted', alist[-1]) [this is how I double-checked my work)
-					file_list.append( args.input + fi + '/' + alist[-1])
+    if (
+        (fi[-3::] != '.py') and ### if the file isn't a python script
+        (fi != '.DS_Store') and ### if the file isn't a nonetype
+        (fi != 'todo_servers.txt') ### could not find a way around this one bc this isn't a directory
+    ): 
+        #print( fi )
+        alist = os.listdir( data + fi ) #assign the list of files to a list
+        # print('unsorted', alist) [this is how I double-checked my work)
+        # now get only the main rules, no speciality rules
+        alist = [ item for item in alist if re.match(r'^\d{8}.txt$', item)]
+        if alist:
+            #print( alist )
+            selectionSort(alist) # mutator
+            #print( alist[-1] )
+            #print()
+            #print( fi + '/' + alist[-1])
+            # print('sorted', alist[-1]) [this is how I double-checked my work)
+            file_list.append( args.input + fi + '/' + alist[-1])
 
 for rulefilepath in file_list:
-	#print( rulefilepath)
-	communityID = rulefilepath.split('/')[-2]
-	rulefile = rulefilepath.split('/')[-1]
-	capture_date = rulefile.split('.')[0]
-	infile = open(rulefilepath, 'r')
-	url = infile.readline().strip()
-	#url = url.split(' ')[1]
-	writer = csv.DictWriter(sys.stdout, delimiter=',', fieldnames=header)
-	line_counter = 1 # can't use enumerate because I increment this in funny ways in the loop
-	#print(communityID, capture_date, url)
-	for row in infile:
-		rule_text = row
-		if rule_text.startswith('='): # excellhandling
-			rule_text = '\\' + rule_text
-                rule_text = rule_text.replace(r'|', '/') # my coders use pipes so they can't appear in the data.
-		rule_texts = nltk.sent_tokenize( rule_text )
-		for rule_text in rule_texts:
-			trow = header.copy()
-			trow['domain'] = 'private_wow'
-			trow['communityID'] = communityID
-			trow['timestamp'] = capture_date
-			trow['text'] = rule_text
-			trow['lineID'] = line_counter
-			trow['ref'] = url
-			line_counter += 1
-			writer.writerow( trow )
-	if ( args.nlines  != -1 ) and ( line_counter >= args.nlines ): ### break after whole row
-		break
+    #print( rulefilepath)
+    communityID = rulefilepath.split('/')[-2]
+    rulefile = rulefilepath.split('/')[-1]
+    capture_date = rulefile.split('.')[0]
+    infile = open(rulefilepath, 'r')
+    url = infile.readline().strip()
+    #url = url.split(' ')[1]
+    writer = csv.DictWriter(sys.stdout, delimiter=',', fieldnames=header)
+    line_counter = 1 # can't use enumerate because I increment this in funny ways in the loop
+    #print(communityID, capture_date, url)
+    for row in infile:
+        rule_text = row
+        #assert '|' not in rule_text, rule_text + '\n' + "No |'s. if this triggers, comment out and add the replace line below" 
+        rule_text = rule_text.replace(r'|', '/') # my coders use pipes so they can't appear in the data.
+        if rule_text.startswith('='): # excellhandling
+            rule_text = '\\' + rule_text
+        #assert '\t' not in rule_text, rule_text.replace('\t', 'XXX') + '\n' + "if this triggers, comment out and add the replace line below" 
+        rule_text = rule_text.replace('\t', '  ') # clean out tabs, which throw off csv cell ordering
+        rule_texts = nltk.sent_tokenize( rule_text )
+        for rule_text in rule_texts:
+            trow = header.copy()
+            trow['domain'] = 'private_wow'
+            trow['communityID'] = communityID
+            trow['timestamp'] = capture_date
+            trow['text'] = rule_text
+            trow['lineID'] = line_counter
+            trow['ref'] = url
+            line_counter += 1
+            writer.writerow( trow )
+    if ( args.nlines  != -1 ) and ( line_counter >= args.nlines ): ### break after whole row
+        break
