@@ -66,6 +66,7 @@ with open(args.input, 'r') as csv_infile:
         rule_text = rule_text.replace(r'\\', ' ') # for minecraft
         if rule_text.startswith('='):
              rule_text = '\\' + rule_text
+        rule_text = rule_text.replace(r'|', '/') # my coders use pipes so they can't appear in the data.
         rule_texts = nltk.sent_tokenize( rule_text )
         for rule_text in rule_texts:
             trow = header.copy()

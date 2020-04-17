@@ -23,7 +23,6 @@ python break_compounds.py <codifying>.xlsx <codifying>_decompounded.xlsx
 added positon agreement measure to compare.py
 
 # TODO
-*  pipes have special meaning now, so make sure there arne't any in rule text: preprocess them out
 *  Caitlyn found that certain cbullet characters or tab charactrs were creeping through and throwing off the excel formatting.
 *  When rule headers in reddit are added, they are missing community, oine id, and other info
 *  move domain column over, closer to codes

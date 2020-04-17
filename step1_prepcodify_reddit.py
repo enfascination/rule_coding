@@ -70,6 +70,7 @@ with open(args.input, 'r') as jsonl_infile:
             #rule_text = rule_text.replace(r'\r', r'\n') # wierd newlines
             if rule_text.startswith('='): # excellhandling
                 rule_text = '\\' + rule_text
+            rule_text = rule_text.replace(r'|', '/') # my coders use pipes so they can't appear in the data.
             ### aiding tokenizer
             rule_text = rule_text.replace(r'.**', '. ') # for reddit: sentences followed by markdown
             rule_text = rule_text.replace(r'.*', '. ') # for reddit

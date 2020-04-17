@@ -100,6 +100,7 @@ for rulefilepath in file_list:
 		rule_text = row
 		if rule_text.startswith('='): # excellhandling
 			rule_text = '\\' + rule_text
+                rule_text = rule_text.replace(r'|', '/') # my coders use pipes so they can't appear in the data.
 		rule_texts = nltk.sent_tokenize( rule_text )
 		for rule_text in rule_texts:
 			trow = header.copy()
