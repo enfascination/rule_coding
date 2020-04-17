@@ -60,8 +60,8 @@ with open( args.columnheader, 'r') as header_file:
 
 with open(args.input, 'r') as jsonl_infile:
     writer = csv.DictWriter(sys.stdout, delimiter=',', fieldnames=header)
-    line_counter = 0 # can't use enumerate because I increment this in funny ways in the loop
     for row in  jsonl_infile: ### for each subreddit
+        line_counter = 0 # can't use enumerate because I increment this in funny ways in the loop
         jrow = json.loads( row )
         for rule in jrow['rules']: ### for each rule in the sub
             rule_text = rule['description']

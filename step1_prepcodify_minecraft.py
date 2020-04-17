@@ -56,10 +56,11 @@ with open( args.columnheader, 'r') as header_file:
 #        communities_coded.append( domain+'_'+community )
 #print( communities_coded )
 
+community_last = ''
 with open(args.input, 'r') as csv_infile:
     reader = csv.DictReader(csv_infile, delimiter=',')
     writer = csv.DictWriter(sys.stdout, delimiter=',', fieldnames=header)
-    line_counter = 1 # can't use enumerate because I incremenet this in funny ways in the loop
+    line_counter = 0 # can't use enumerate because I incremenet this in funny ways in the loop
     for row in reader:
         rule_text = row['text']
         rule_text = rule_text.replace(r'\\', ' ') # for minecraft
@@ -74,6 +75,9 @@ with open(args.input, 'r') as csv_infile:
             else:
                 trow['communityID'] = row['host'] + row['port']
             trow['text'] = rule_text
+            if community_last != trow['communityID']:
+                line_counter = 0
+                community_last = trow['communityID']
             trow['lineID'] = line_counter
             line_counter += 1
             writer.writerow( trow )
