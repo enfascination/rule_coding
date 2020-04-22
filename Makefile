@@ -14,7 +14,7 @@ full:
 	cat data/header.csv > data/all_data_raw/reddit_uncoded_rules_codifying.csv
 	cat data/header.csv > data/all_data_raw/minecraft_uncoded_rules_codifying.csv
 	python step1_prepcodify_wow.py -t all -n -1       >> data/all_data_raw/wow_uncoded_rules_codifying.csv
-	python step1_prepcodify_reddit.py -t all -n -1    >> data/all_data_raw/reddit_uncoded_rules_codifying.csv
+	python step1_prepcodify_reddit.py -t all -n -1 -i 'data/RedditRulesScraperOutput.txt' >> data/all_data_raw/reddit_uncoded_rules_codifying.csv
 	python step1_prepcodify_minecraft.py -t all -n -1 >> data/all_data_raw/minecraft_uncoded_rules_codifying.csv
 
 build: full

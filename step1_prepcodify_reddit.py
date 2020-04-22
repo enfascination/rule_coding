@@ -17,10 +17,8 @@ parser = argparse.ArgumentParser()
 # parser.add_argument('-d', '--debug', nargs='?', metavar='1..5', type=int,
 #                                 choices=range(1, 5), default=2,
 #                                 help='Debug level is a value between 1 and 5')
-# parser.add_argument('-g', '--gui', action='store_true', 
-#                                       help='Start in graphical mode if given')
-parser.add_argument('-i', '--input', nargs='?', metavar='path',
-                                     type=str, default='data/RedditRulesScraperOutput.txt',
+parser.add_argument('-i', '--input', nargs='?',
+                    type=argparse.FileType('r'), default=sys.stdin,
                                      help='Take program input in the file passed after -i')
 parser.add_argument('-c', '--columnheader', nargs='?', metavar='path',
                                      type=str, default='data/header.csv',
@@ -58,7 +56,7 @@ with open( args.columnheader, 'r') as header_file:
 #        communities_coded.append( domain+'_'+community )
 #print( communities_coded )
 
-with open(args.input, 'r') as jsonl_infile:
+with args.input as jsonl_infile:
     writer = csv.DictWriter(sys.stdout, delimiter=',', fieldnames=header)
     for row in  jsonl_infile: ### for each subreddit
         line_counter = 0 # can't use enumerate because I increment this in funny ways in the loop
@@ -85,7 +83,8 @@ with open(args.input, 'r') as jsonl_infile:
             rule_text = rule_text.replace('\n\n', '. ') # for reddit ### not sure why this catches things the above don't
             rule_text = rule_text.replace(r'\n**', '. ') # for reddit
             rule_text = rule_text.replace(r'\n*', '. ') # for reddit
-            rule_text = rule_text.replace(r'\n', ' ') # for reddit
+            rule_text = rule_text.replace(r'\n', '. ') # for reddit
+            rule_text = rule_text.replace('\n', '. ') # for reddit
             rule_texts = nltk.sent_tokenize( rule_text )
             ### write the rule as an IS, and it's descript as several IS's
             ### this is necesary because it simplifies the context tab and because rules are sometimes written with the description referring to content in the short name of the rule

@@ -25,3 +25,4 @@ added positon agreement measure to compare.py
 # TODO
 *  When rule headers in reddit are added, they are missing community, oine id, and other info
 *  move domain column over, closer to codes
+*  DONE: More newline problems.  line 15-16 of r/explainlikeimfive, r/food 4x, r/gadgets 4x, r/sports 2x, r/photoshopbattles, r/getmotivated, r/history, r/WritingPrompts many, r/personalfinance
